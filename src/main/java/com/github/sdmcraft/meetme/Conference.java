@@ -159,18 +159,19 @@ public class Conference extends Observable {
 		dialoutAction.setChannel(extn.getNumber());
 		dialoutAction.setContext(extn.getContext());
 		dialoutAction.setCallerId(extn.getCallerId());
-		dialoutAction.setActionId("myUniqueeId");		
-		
+
 		/* TODO Remove these hardcodings */		
 		dialoutAction.setPriority(new Integer(1));
 		dialoutAction.setTimeout(new Long(30000));
 
-		dialoutAction.setExten(meetMeRoom.getRoomNumber());
+		//dialoutAction.setExten(meetMeRoom.getRoomNumber());
+		dialoutAction.setApplication("MeetMe");
+		dialoutAction.setData(meetMeRoom.getRoomNumber() + ",TM");
 		
 		context.getConnection().getManagerConnection()
 				.sendAction(dialoutAction, new DialoutActionCallback());
 		
-		pendingDialOuts.add(extn.getNumber());
+		pendingDialOuts.add(extn.getCallerId());
 
 		logger.info("Dial out was requested for " + extn.getNumber());
 		return extn.getNumber() + "@" + meetMeRoom.getRoomNumber();

@@ -64,7 +64,11 @@ public class AsteriskUtils {
 	public static final String getUserPhoneNumber(MeetMeUser user) {
 //		String channel = user.getChannel().getName();
 //		return getPhoneNumberFromChannel(channel);
-		return user.getChannel().getCallerId().getNumber();
+		String number = user.getChannel().getCallerId().getNumber();
+		if(number == null){
+			number = user.getChannel().getCallerId().getName();
+		}
+		return number;
 	}
 
 	/**
