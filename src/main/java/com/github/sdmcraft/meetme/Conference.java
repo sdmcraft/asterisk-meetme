@@ -28,6 +28,8 @@ public class Conference extends Observable {
      */
     private final Map<String, User> conferenceUserMap;
 
+    private final Map<String, Conference> subConferenceMap = new HashMap<String, Conference>();
+
     /**
      * The context.
      */
@@ -190,6 +192,20 @@ public class Conference extends Observable {
             }
 
         }
+    }
+
+    public void requestStartSubconference(String roomNumber) {
+        Conference subConference = Conference.getInstance(roomNumber, context);
+        subConferenceMap.put(roomNumber, subConference);
+    }
+
+    public void requestStopSubconference(String roomNumber) throws Exception {
+        Conference subConference = subConferenceMap.get(roomNumber);
+        subConference.requestEndConference();
+    }
+
+    public void requestMoveToSubConference(User user, String subConfNumber) {
+        user.requestTransfer(subConfNumber);
     }
 
     /**

@@ -108,8 +108,23 @@ public class Client implements Observer {
         for (Extension extn : extensions) {
             System.out.println("User Number:" +
                     conference.requestDialOut(extn) + " dialled out");
-            Thread.sleep(30000);
+            Thread.sleep(10000);
         }
+
+
+        User user1 = conference.getUsers().get(extensions[0].getNumber() + "@" + conferenceNumber);
+        user1.requestTransfer(String.valueOf(Integer.parseInt(conferenceNumber) + 1));
+
+        User user2 = conference.getUsers().get(extensions[1].getNumber() + "@" + conferenceNumber);
+        user2.requestTransfer(String.valueOf(Integer.parseInt(conferenceNumber) + 2));
+
+//        User user3 = conference.getUsers().get(extensions[2].getNumber() + "@" + conferenceNumber);
+//        user3.requestTransfer(String.valueOf(Integer.parseInt(conferenceNumber) + 3));
+
+        user1.requestTransfer(conferenceNumber);
+        user2.requestTransfer(conferenceNumber);
+//        user3.requestTransfer(String.valueOf(Integer.parseInt(conferenceNumber)));
+
 
         if (users.containsKey("SIP/6000")) {
             //users.get("SIP/6000").requestStartRecording();
@@ -147,8 +162,11 @@ public class Client implements Observer {
 //                    "SIP/callcentric/011919971647800")
 //            }, null);
 
-        new Client().demo("192.168.1.103", "admin", "amp111", "600",
-                new Extension[]{new Extension("LocalSets", "SIP/101", "SIP/101")},
+        Extension ext1 = new Extension("LocalSets", "SIP/101", "SIP/101");
+        Extension ext2 = new Extension("LocalSets", "SIP/102", "SIP/102");
+        Extension ext3 = new Extension("LocalSets", "SIP/103", "SIP/103");
+        new Client().demo("192.168.1.102", "admin", "amp111", "600",
+                new Extension[]{ ext1, ext2 /*,ext3*/},
                 null);
 
         //		new Client().demo("192.168.1.104", "admin", "amp111", "600", 
