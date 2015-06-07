@@ -1,15 +1,7 @@
 package com.github.sdmcraft.meetme;
 
-import org.asteriskjava.live.AsteriskChannel;
-import org.asteriskjava.live.AsteriskQueue;
-import org.asteriskjava.live.AsteriskQueueEntry;
-import org.asteriskjava.live.AsteriskServer;
-import org.asteriskjava.live.AsteriskServerListener;
-import org.asteriskjava.live.ChannelState;
-import org.asteriskjava.live.MeetMeRoom;
-import org.asteriskjava.live.MeetMeUser;
+import org.asteriskjava.live.*;
 import org.asteriskjava.live.internal.AsteriskAgentImpl;
-
 import org.asteriskjava.manager.ManagerEventListener;
 import org.asteriskjava.manager.event.HangupEvent;
 import org.asteriskjava.manager.event.ManagerEvent;
@@ -18,31 +10,33 @@ import org.asteriskjava.manager.event.NewStateEvent;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
 // TODO: Auto-generated Javadoc
+
 /**
  * The Class LiveEventHandler.
  */
 public class LiveEventHandler implements AsteriskServerListener,
-    ManagerEventListener, PropertyChangeListener {
-    /** The Constant logger. */
+        ManagerEventListener, PropertyChangeListener {
+    /**
+     * The Constant logger.
+     */
     private final static Logger logger = Logger.getLogger(LiveEventHandler.class.getName());
 
-    /** The context. */
+    /**
+     * The context.
+     */
     private final Context context;
 
     /**
      * Instantiates a new live event handler.
      *
-     * @param context
-     *            the context
+     * @param context the context
      */
     public LiveEventHandler(Context context) {
         this.context = context;
@@ -98,7 +92,7 @@ public class LiveEventHandler implements AsteriskServerListener,
 
             for (AsteriskQueueEntry asteriskQueueEntry : asteriskQueue.getEntries()) {
                 asteriskQueueEntry.getChannel()
-                                  .removePropertyChangeListener(this);
+                        .removePropertyChangeListener(this);
             }
         }
 
@@ -167,7 +161,7 @@ public class LiveEventHandler implements AsteriskServerListener,
             // }
             // }
             Conference conference = context.getConferences()
-                                           .get(user.getRoom().getRoomNumber());
+                    .get(user.getRoom().getRoomNumber());
             conference.handleAddConferenceUser(user);
         } catch (Exception ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
@@ -225,7 +219,7 @@ public class LiveEventHandler implements AsteriskServerListener,
         if (managerEvent instanceof MeetMeEndEvent) {
             MeetMeEndEvent endEvent = (MeetMeEndEvent) managerEvent;
             Conference conference = context.getConferences()
-                                           .get(endEvent.getMeetMe());
+                    .get(endEvent.getMeetMe());
 
             if (conference != null) {
                 conference.handleEndConference();
@@ -243,7 +237,7 @@ public class LiveEventHandler implements AsteriskServerListener,
                     for (String pendingDialout : conference.getPendingDialOuts()) {
                         if (stateEvent.getCallerIdName().equals(pendingDialout)) {
                             System.out.println("Pending dialout answered for:" +
-                                pendingDialout);
+                                    pendingDialout);
                             answeredDialouts.add(pendingDialout);
 
                             //conference.handleAddConferenceUser(user)
