@@ -7,6 +7,8 @@ import org.asteriskjava.live.MeetMeUser;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 // TODO: Auto-generated Javadoc
@@ -28,6 +30,9 @@ public class User extends Observable implements PropertyChangeListener {
      */
     private final static Logger logger = Logger.getLogger(User.class.getName());
 
+    private final Timer timer;
+    private TimerTask dispatchUserLeftTask;
+
     // public User(AsteriskChannel channel, String userId, String phoneNumber,
     // boolean muted, boolean talking) {
     // this.channel = channel;
@@ -43,9 +48,28 @@ public class User extends Observable implements PropertyChangeListener {
      * @param meetMeUser the meet me user
      */
     public User(MeetMeUser meetMeUser) {
+        timer = new Timer();
+        addOrReplaceMeetMeUser(meetMeUser);
+    }
+
+    public void addOrReplaceMeetMeUser(MeetMeUser meetMeUser) {
+        boolean transferred = false;
+        if(this.meetMeUser != null) {
+            this.meetMeUser.removePropertyChangeListener(this);
+            transferred = true;
+        }
         this.meetMeUser = meetMeUser;
-        meetMeUser.addPropertyChangeListener(this);
+        this.meetMeUser.addPropertyChangeListener(this);
         alive = true;
+        if(dispatchUserLeftTask != null) {
+            dispatchUserLeftTask.cancel();
+            dispatchUserLeftTask = null;
+        }
+        if(transferred) {
+            logger.info("Dispatching meetMeUser-transferred");
+            setChanged();
+            notifyObservers(new Event(EventType.USER_TRANSFERRED));
+        }
     }
 
     public void requestHangUp() {
@@ -76,6 +100,11 @@ public class User extends Observable implements PropertyChangeListener {
 
     public void requestStopRecording() {
         meetMeUser.getChannel().stopMonitoring();
+    }
+
+    public void requestTransfer(String roomNumber) {
+        //TODO Remove hardcoding
+        meetMeUser.getChannel().redirect("LocalSets", roomNumber, 1);
     }
 
     /*
@@ -117,8 +146,19 @@ public class User extends Observable implements PropertyChangeListener {
         logger.info("Destroying user " + getUserId());
         meetMeUser.removePropertyChangeListener(this);
         setChanged();
-        notifyObservers(new Event(EventType.USER_LEFT));
         alive = false;
+        if(dispatchUserLeftTask != null) {
+            dispatchUserLeftTask.cancel();
+        }
+        dispatchUserLeftTask = new TimerTask() {
+            long scheduled = System.currentTimeMillis();
+            @Override
+            public void run() {
+                logger.info("Running after " + (System.currentTimeMillis() - scheduled)/1000);
+                notifyObservers(new Event(EventType.USER_LEFT));
+            }
+        };
+        timer.schedule(dispatchUserLeftTask, 5000);
     }
 
     /**
@@ -127,9 +167,9 @@ public class User extends Observable implements PropertyChangeListener {
      * @return the user id
      */
     public String getUserId() {
-        return AsteriskUtils.getUserPhoneNumber(meetMeUser) + "@"
-                + meetMeUser.getRoom().getRoomNumber();
+        return this.getPhoneNumber();
     }
+
 
     /**
      * Checks if is muted.
@@ -172,6 +212,10 @@ public class User extends Observable implements PropertyChangeListener {
 
     public boolean isAlive() {
         return alive;
+    }
+
+    public String getConferenceId() {
+        return this.meetMeUser.getRoom().getRoomNumber();
     }
 
 }

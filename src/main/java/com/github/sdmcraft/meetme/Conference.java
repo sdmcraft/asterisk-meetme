@@ -28,6 +28,9 @@ public class Conference extends Observable {
      */
     private final Map<String, User> conferenceUserMap;
 
+
+    private final Conference parentConference;
+
     /**
      * The context.
      */
@@ -57,7 +60,7 @@ public class Conference extends Observable {
      * @param context          the context for interaction between MeetMe-java and the
      *                         Asterisk server
      */
-    private Conference(String conferenceNumber, Context context) {
+    private Conference(String conferenceNumber, Context context, Conference parentConference) {
 
         logger.info("Creating a new conference " + conferenceNumber);
         meetMeRoom = context.getAsteriskServer()
@@ -66,6 +69,7 @@ public class Conference extends Observable {
         this.conferenceUserMap = meetMeUsersToConferenceUserMap(meetMeRoom
                 .getUsers());
         this.conferenceNumber = conferenceNumber;
+        this.parentConference = parentConference;
     }
 
     /**
@@ -86,11 +90,19 @@ public class Conference extends Observable {
      * @return single instance of Conference
      */
     public static Conference getInstance(String conferenceNumber,
-                                         Context context) {
-        Conference conference = new Conference(conferenceNumber, context);
+                                         Context context, Conference parentConference) {
+        Conference conference = new Conference(conferenceNumber, context, parentConference);
         conference.init();
         return conference;
     }
+
+    public static Conference getInstance(String conferenceNumber,
+                                         Context context) {
+        Conference conference = new Conference(conferenceNumber, context, null);
+        conference.init();
+        return conference;
+    }
+
 
     /**
      * Meet me users to conference user map.
@@ -169,7 +181,7 @@ public class Conference extends Observable {
         pendingDialOuts.add(extn.getCallerId());
 
         logger.info("Dial out was requested for " + extn.getNumber());
-        return extn.getNumber() + "@" + meetMeRoom.getRoomNumber();
+        return extn.getNumber();
     }
 
     /**
@@ -178,7 +190,7 @@ public class Conference extends Observable {
      * @throws Exception the exception
      */
     public void requestEndConference() throws Exception {
-        logger.info("Request received to end conference. Hanging up all users..");
+        logger.info("Request received to end conference. Hanging up all users.");
 
 		/*
          * Lock conferenceUserMap to avoid user left events modifying it while
@@ -192,23 +204,33 @@ public class Conference extends Observable {
         }
     }
 
+    public void requestMoveToSubConference(User user, String subConfNumber) {
+        if(!context.getConferences().containsKey(subConfNumber)) {
+            Conference.getInstance(subConfNumber, context);
+        }
+        user.requestTransfer(subConfNumber);
+    }
+
     /**
-     * Handle add conference user.
+     * Handle add or transfer conference meetMeUser.
      *
-     * @param user        the user
-     * @param phoneNumber the phone number
+     * @param meetMeUser        the meetMeUser
      * @throws Exception the exception
      */
-    public void handleAddConferenceUser(MeetMeUser user) throws Exception {
-        logger.info("Handling user join event");
-        User conferenceUser = new User(user);
-        conferenceUserMap.put(conferenceUser.getUserId(), conferenceUser);
+    public void handleJoinConferenceUser(MeetMeUser meetMeUser) throws Exception {
+        logger.info("Handling meetMeUser join event");
+        User conferenceUser = null;
+        if(conferenceUserMap.containsKey(AsteriskUtils.getUserPhoneNumber(meetMeUser))) {
+            conferenceUser = conferenceUserMap.get(AsteriskUtils.getUserPhoneNumber(meetMeUser));
+            conferenceUser.addOrReplaceMeetMeUser(meetMeUser);
+        } else {
+            conferenceUser = new User(meetMeUser);
+            conferenceUserMap.put(conferenceUser.getUserId(), conferenceUser);
+            setChanged();
 
-        setChanged();
-
-        logger.info("Dispatching user-joined");
-        notifyObservers(new Event(EventType.USER_JOINED, conferenceUser));
-
+            logger.info("Dispatching meetMeUser-joined");
+            notifyObservers(new Event(EventType.USER_JOINED, conferenceUser));
+        }
     }
 
     /**
@@ -216,9 +238,14 @@ public class Conference extends Observable {
      */
     public void handleEndConference() {
         logger.info("Handling conference end event");
-        conferenceUserMap.clear();
-        setChanged();
-        notifyObservers(new Event(EventType.CONFERENCE_ENDED));
+        if(context.getChildConferences(conferenceNumber).size() == 0) {
+            conferenceUserMap.clear();
+            setChanged();
+            notifyObservers(new Event(EventType.CONFERENCE_ENDED));
+        }
+        else {
+            logger.info("Not ending this conference as there are child conferences");
+        }
     }
 
     /**
@@ -241,15 +268,6 @@ public class Conference extends Observable {
      */
     public Map<String, User> getUsers() {
         return conferenceUserMap;
-    }
-
-    /**
-     * Gets the context.
-     *
-     * @return the context
-     */
-    public Context getState() {
-        return context;
     }
 
     /**
@@ -283,4 +301,9 @@ public class Conference extends Observable {
     public List<String> getPendingDialOuts() {
         return pendingDialOuts;
     }
+
+    public Conference getParentConference() {
+        return parentConference;
+    }
+
 }

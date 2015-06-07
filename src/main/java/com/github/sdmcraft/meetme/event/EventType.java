@@ -42,5 +42,7 @@ public enum EventType {
      */
     USER_LEFT,
 
-    CHANNEL_HUNGUP
+    CHANNEL_HUNGUP,
+
+    USER_TRANSFERRED
 }
