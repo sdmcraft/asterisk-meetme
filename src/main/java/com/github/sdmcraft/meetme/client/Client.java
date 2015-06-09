@@ -102,29 +102,36 @@ public class Client implements Observer {
             throws Exception {
         Context context = Context.getInstance(ip, admin, pwd, extensionUrl);
         Conference conference = Conference.getInstance(conferenceNumber, context);
+        Conference subConference1 = Conference.getInstance(String.valueOf(Integer.parseInt(conferenceNumber) + 1), context);
         conference.addObserver(this);
+        subConference1.addObserver(this);
         Thread.sleep(2 * 1000);
 
         for (Extension extn : extensions) {
             System.out.println("User Number:" +
                     conference.requestDialOut(extn) + " dialled out");
-            Thread.sleep(10000);
+            Thread.sleep(2000);
         }
 
 
         User user1 = conference.getUsers().get(extensions[0].getNumber() + "@" + conferenceNumber);
-        user1.requestTransfer(String.valueOf(Integer.parseInt(conferenceNumber) + 1));
+        user1.requestTransfer(subConference1.getconferenceNumber());
 
         User user2 = conference.getUsers().get(extensions[1].getNumber() + "@" + conferenceNumber);
-        user2.requestTransfer(String.valueOf(Integer.parseInt(conferenceNumber) + 2));
+        user2.requestTransfer(subConference1.getconferenceNumber());
 
 //        User user3 = conference.getUsers().get(extensions[2].getNumber() + "@" + conferenceNumber);
 //        user3.requestTransfer(String.valueOf(Integer.parseInt(conferenceNumber) + 3));
 
+        user1 = subConference1.getUsers().get(extensions[0].getNumber() + "@" + subConference1.getconferenceNumber());
         user1.requestTransfer(conferenceNumber);
+        user2 = subConference1.getUsers().get(extensions[1].getNumber() + "@" + subConference1.getconferenceNumber());
         user2.requestTransfer(conferenceNumber);
 //        user3.requestTransfer(String.valueOf(Integer.parseInt(conferenceNumber)));
 
+        Thread.sleep(5000);
+        user1.requestHangUp();
+        user2.requestHangUp();
 
         if (users.containsKey("SIP/6000")) {
             //users.get("SIP/6000").requestStartRecording();
@@ -142,6 +149,7 @@ public class Client implements Observer {
         }
 
         conference.destroy();
+        subConference1.destroy();
         context.destroy();
     }
 
@@ -165,9 +173,8 @@ public class Client implements Observer {
         Extension ext1 = new Extension("LocalSets", "SIP/101", "SIP/101");
         Extension ext2 = new Extension("LocalSets", "SIP/102", "SIP/102");
         Extension ext3 = new Extension("LocalSets", "SIP/103", "SIP/103");
-        new Client().demo("192.168.1.102", "admin", "amp111", "600",
-                new Extension[]{ ext1, ext2 /*,ext3*/},
-                null);
+        new Client().demo("10.40.61.253", "admin", "amp111", "600",
+                new Extension[]{ ext1, ext2/* ,ext3*/}, null);
 
         //		new Client().demo("192.168.1.104", "admin", "amp111", "600", 
         //				new Extension[] { new Extension("from-internal", "SIP/callcentric/011919971647800", "SIP/callcentric/011919971647800") },
