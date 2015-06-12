@@ -7,6 +7,8 @@ import org.asteriskjava.live.MeetMeUser;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Observable;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 // TODO: Auto-generated Javadoc
@@ -28,6 +30,16 @@ public class User extends Observable implements PropertyChangeListener {
      */
     private final static Logger logger = Logger.getLogger(User.class.getName());
 
+    private final Timer timer;
+    private TimerTask dispatchUserLeftTask;
+
+    private class DispatchUserLeftTask implements Runnable {
+        @Override
+        public void run() {
+            notifyObservers(new Event(EventType.USER_LEFT));
+        }
+    }
+
     // public User(AsteriskChannel channel, String userId, String phoneNumber,
     // boolean muted, boolean talking) {
     // this.channel = channel;
@@ -43,9 +55,21 @@ public class User extends Observable implements PropertyChangeListener {
      * @param meetMeUser the meet me user
      */
     public User(MeetMeUser meetMeUser) {
+        timer = new Timer();
+        addOrReplaceMeetMeUser(meetMeUser);
+    }
+
+    public void addOrReplaceMeetMeUser(MeetMeUser meetMeUser) {
+        if(this.meetMeUser != null) {
+            this.meetMeUser.removePropertyChangeListener(this);
+        }
         this.meetMeUser = meetMeUser;
-        meetMeUser.addPropertyChangeListener(this);
+        this.meetMeUser.addPropertyChangeListener(this);
         alive = true;
+        if(dispatchUserLeftTask != null) {
+            dispatchUserLeftTask.cancel();
+            dispatchUserLeftTask = null;
+        }
     }
 
     public void requestHangUp() {
@@ -122,8 +146,17 @@ public class User extends Observable implements PropertyChangeListener {
         logger.info("Destroying user " + getUserId());
         meetMeUser.removePropertyChangeListener(this);
         setChanged();
-        notifyObservers(new Event(EventType.USER_LEFT));
         alive = false;
+        if(dispatchUserLeftTask != null) {
+            dispatchUserLeftTask.cancel();
+        }
+        dispatchUserLeftTask = new TimerTask() {
+            @Override
+            public void run() {
+                notifyObservers(new Event(EventType.USER_LEFT));
+            }
+        };
+        timer.schedule(dispatchUserLeftTask, 2000);
     }
 
     /**
@@ -132,6 +165,10 @@ public class User extends Observable implements PropertyChangeListener {
      * @return the user id
      */
     public String getUserId() {
+        return generateUserId(this.meetMeUser);
+    }
+
+    public static String generateUserId(MeetMeUser meetMeUser) {
         return AsteriskUtils.getUserPhoneNumber(meetMeUser) + "@"
                 + meetMeUser.getRoom().getRoomNumber();
     }
