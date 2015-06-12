@@ -170,6 +170,7 @@ public class Client implements Observer {
 //                    "SIP/callcentric/011919971647800")
 //            }, null);
 
+
         Extension ext1 = new Extension("LocalSets", "SIP/101", "SIP/101");
         Extension ext2 = new Extension("LocalSets", "SIP/102", "SIP/102");
         Extension ext3 = new Extension("LocalSets", "SIP/103", "SIP/103");
