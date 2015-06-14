@@ -39,8 +39,8 @@ public class Client implements Observer {
                 user.addObserver(this);
                 users.put(user.getPhoneNumber(), user);
                 System.out.println(user.getUserId() +
-                        " joined the audio conference with phone number " +
-                        user.getPhoneNumber());
+                        " joined the audio conference " +
+                        user.getConferenceId());
 
                 break;
 
@@ -78,8 +78,12 @@ public class Client implements Observer {
                 user = (User) dispatcher;
                 users.remove(user.getPhoneNumber());
                 System.out.println(user.getPhoneNumber() +
-                        " left the audio conference");
+                        " left the audio conference " + user.getConferenceId());
+                break;
 
+            case USER_TRANSFERRED:
+                user = (User) dispatcher;
+                System.out.println(user.getPhoneNumber() + " got transferred to " + user.getConferenceId());
                 break;
         }
     }
@@ -102,10 +106,10 @@ public class Client implements Observer {
             throws Exception {
         Context context = Context.getInstance(ip, admin, pwd, extensionUrl);
         Conference conference = Conference.getInstance(conferenceNumber, context);
-        Conference subConference1 = Conference.getInstance(String.valueOf(Integer.parseInt(conferenceNumber) + 1), context);
+        Conference subConference1 = Conference.getInstance(String.valueOf(Integer.parseInt(conferenceNumber) + 1), context, conference);
         conference.addObserver(this);
         subConference1.addObserver(this);
-        Thread.sleep(2 * 1000);
+        //Thread.sleep(2 * 1000);
 
         for (Extension extn : extensions) {
             System.out.println("User Number:" +
@@ -124,6 +128,7 @@ public class Client implements Observer {
 //        user3.requestTransfer(String.valueOf(Integer.parseInt(conferenceNumber) + 3));
 
         user1 = subConference1.getUsers().get(extensions[0].getNumber() + "@" + subConference1.getconferenceNumber());
+
         user1.requestTransfer(conferenceNumber);
         user2 = subConference1.getUsers().get(extensions[1].getNumber() + "@" + subConference1.getconferenceNumber());
         user2.requestTransfer(conferenceNumber);
@@ -176,7 +181,7 @@ public class Client implements Observer {
         Extension ext1 = new Extension("LocalSets", "SIP/101", "SIP/101");
         Extension ext2 = new Extension("LocalSets", "SIP/102", "SIP/102");
         Extension ext3 = new Extension("LocalSets", "SIP/103", "SIP/103");
-        new Client().demo("10.40.61.253", "admin", "amp111", "600",
+        new Client().demo("192.168.1.103", "admin", "amp111", "600",
                 new Extension[]{ ext1, ext2/* ,ext3*/}, null);
 
         //		new Client().demo("192.168.1.104", "admin", "amp111", "600", 

@@ -212,27 +212,26 @@ public class Conference extends Observable {
     }
 
     /**
-     * Handle add conference meetMeUser.
+     * Handle add or transfer conference meetMeUser.
      *
      * @param meetMeUser        the meetMeUser
      * @throws Exception the exception
      */
-    public void handleAddConferenceUser(MeetMeUser meetMeUser) throws Exception {
+    public void handleJoinConferenceUser(MeetMeUser meetMeUser) throws Exception {
         logger.info("Handling meetMeUser join event");
         User conferenceUser = null;
-        if(conferenceUserMap.containsKey(User.generateUserId(meetMeUser))) {
-            conferenceUser = conferenceUserMap.get(User.generateUserId(meetMeUser));
+        //TODO:Get rid of this generating userid stupidity. Use the userid provided by Asterisk
+        if(conferenceUserMap.containsKey(User.generateUserId(meetMeUser, conferenceNumber))) {
+            conferenceUser = conferenceUserMap.get(User.generateUserId(meetMeUser, conferenceNumber));
             conferenceUser.addOrReplaceMeetMeUser(meetMeUser);
         } else {
             conferenceUser = new User(meetMeUser);
             conferenceUserMap.put(conferenceUser.getUserId(), conferenceUser);
+            setChanged();
+
+            logger.info("Dispatching meetMeUser-joined");
+            notifyObservers(new Event(EventType.USER_JOINED, conferenceUser));l
         }
-
-        setChanged();
-
-        logger.info("Dispatching meetMeUser-joined");
-        notifyObservers(new Event(EventType.USER_JOINED, conferenceUser));
-
     }
 
     /**

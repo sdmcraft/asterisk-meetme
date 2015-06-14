@@ -33,13 +33,6 @@ public class User extends Observable implements PropertyChangeListener {
     private final Timer timer;
     private TimerTask dispatchUserLeftTask;
 
-    private class DispatchUserLeftTask implements Runnable {
-        @Override
-        public void run() {
-            notifyObservers(new Event(EventType.USER_LEFT));
-        }
-    }
-
     // public User(AsteriskChannel channel, String userId, String phoneNumber,
     // boolean muted, boolean talking) {
     // this.channel = channel;
@@ -60,8 +53,10 @@ public class User extends Observable implements PropertyChangeListener {
     }
 
     public void addOrReplaceMeetMeUser(MeetMeUser meetMeUser) {
+        boolean transferred = false;
         if(this.meetMeUser != null) {
             this.meetMeUser.removePropertyChangeListener(this);
+            transferred = true;
         }
         this.meetMeUser = meetMeUser;
         this.meetMeUser.addPropertyChangeListener(this);
@@ -69,6 +64,10 @@ public class User extends Observable implements PropertyChangeListener {
         if(dispatchUserLeftTask != null) {
             dispatchUserLeftTask.cancel();
             dispatchUserLeftTask = null;
+        }
+        if(transferred) {
+            logger.info("Dispatching meetMeUser-transferred");
+            notifyObservers(new Event(EventType.USER_TRANSFERRED));
         }
     }
 
@@ -151,12 +150,14 @@ public class User extends Observable implements PropertyChangeListener {
             dispatchUserLeftTask.cancel();
         }
         dispatchUserLeftTask = new TimerTask() {
+            long scheduled = System.currentTimeMillis();
             @Override
             public void run() {
+                logger.info("Running after " + (System.currentTimeMillis() - scheduled)/1000);
                 notifyObservers(new Event(EventType.USER_LEFT));
             }
         };
-        timer.schedule(dispatchUserLeftTask, 2000);
+        timer.schedule(dispatchUserLeftTask, 5000);
     }
 
     /**
@@ -169,8 +170,12 @@ public class User extends Observable implements PropertyChangeListener {
     }
 
     public static String generateUserId(MeetMeUser meetMeUser) {
+        return generateUserId(meetMeUser, meetMeUser.getRoom().getRoomNumber());
+    }
+
+    public static String generateUserId(MeetMeUser meetMeUser, String conferenceId) {
         return AsteriskUtils.getUserPhoneNumber(meetMeUser) + "@"
-                + meetMeUser.getRoom().getRoomNumber();
+                + conferenceId;
     }
 
     /**
@@ -214,6 +219,10 @@ public class User extends Observable implements PropertyChangeListener {
 
     public boolean isAlive() {
         return alive;
+    }
+
+    public String getConferenceId() {
+        return this.meetMeUser.getRoom().getRoomNumber();
     }
 
 }

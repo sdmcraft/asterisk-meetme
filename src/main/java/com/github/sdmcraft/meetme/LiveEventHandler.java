@@ -162,10 +162,10 @@ public class LiveEventHandler implements AsteriskServerListener,
             // }
             Conference conference = context.getConferences()
                     .get(user.getRoom().getRoomNumber());
-            conference.handleAddConferenceUser(user);
+            conference.handleJoinConferenceUser(user);
             Conference parentConference = conference.getParentConference();
             while(parentConference != null) {
-                parentConference.handleAddConferenceUser(user);
+                parentConference.handleJoinConferenceUser(user);
                 parentConference = parentConference.getParentConference();
             }
         } catch (Exception ex) {
@@ -245,7 +245,7 @@ public class LiveEventHandler implements AsteriskServerListener,
                                     pendingDialout);
                             answeredDialouts.add(pendingDialout);
 
-                            //conference.handleAddConferenceUser(user)
+                            //conference.handleJoinConferenceUser(user)
                         }
                     }
 
