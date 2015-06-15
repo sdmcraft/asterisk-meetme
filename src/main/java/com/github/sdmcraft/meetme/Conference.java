@@ -190,7 +190,7 @@ public class Conference extends Observable {
      * @throws Exception the exception
      */
     public void requestEndConference() throws Exception {
-        logger.info("Request received to end conference. Hanging up all users..");
+        logger.info("Request received to end conference. Hanging up all users.");
 
 		/*
          * Lock conferenceUserMap to avoid user left events modifying it while
@@ -230,7 +230,7 @@ public class Conference extends Observable {
             setChanged();
 
             logger.info("Dispatching meetMeUser-joined");
-            notifyObservers(new Event(EventType.USER_JOINED, conferenceUser));l
+            notifyObservers(new Event(EventType.USER_JOINED, conferenceUser));
         }
     }
 
@@ -239,9 +239,14 @@ public class Conference extends Observable {
      */
     public void handleEndConference() {
         logger.info("Handling conference end event");
-        conferenceUserMap.clear();
-        setChanged();
-        notifyObservers(new Event(EventType.CONFERENCE_ENDED));
+        if(context.getChildConferences(conferenceNumber).size() == 0) {
+            conferenceUserMap.clear();
+            setChanged();
+            notifyObservers(new Event(EventType.CONFERENCE_ENDED));
+        }
+        else {
+            logger.info("Not ending this conference as there are child conferences");
+        }
     }
 
     /**

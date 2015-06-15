@@ -21,8 +21,6 @@ import java.util.Observer;
  * The Class Client.
  */
 public class Client implements Observer {
-    Map<String, User> users = new HashMap<String, User>();
-
     /*
      * (non-Javadoc)
      *
@@ -37,7 +35,6 @@ public class Client implements Observer {
 
                 User user = (User) event.getData();
                 user.addObserver(this);
-                users.put(user.getPhoneNumber(), user);
                 System.out.println(user.getUserId() +
                         " joined the audio conference " +
                         user.getConferenceId());
@@ -45,7 +42,6 @@ public class Client implements Observer {
                 break;
 
             case CONFERENCE_ENDED:
-                users.clear();
                 System.out.println("The audio conference ended");
 
                 break;
@@ -76,7 +72,6 @@ public class Client implements Observer {
 
             case USER_LEFT:
                 user = (User) dispatcher;
-                users.remove(user.getPhoneNumber());
                 System.out.println(user.getPhoneNumber() +
                         " left the audio conference " + user.getConferenceId());
                 break;
@@ -135,26 +130,8 @@ public class Client implements Observer {
 //        user3.requestTransfer(String.valueOf(Integer.parseInt(conferenceNumber)));
 
         Thread.sleep(5000);
-        user1.requestHangUp();
-        user2.requestHangUp();
-
-        if (users.containsKey("SIP/6000")) {
-            //users.get("SIP/6000").requestStartRecording();
-            Thread.sleep(10000);
-
-            users.get("SIP/6000").requestMuteStateChange();
-            Thread.sleep(10000);
-
-            users.get("SIP/6000").requestMuteStateChange();
-            Thread.sleep(10000);
-
-            //users.get("SIP/6000").requestStopRecording();
-            users.get("SIP/6000").requestHangUp();
-            Thread.sleep(10000);
-        }
-
-        conference.destroy();
         subConference1.destroy();
+        conference.destroy();
         context.destroy();
     }
 
@@ -181,7 +158,7 @@ public class Client implements Observer {
         Extension ext1 = new Extension("LocalSets", "SIP/101", "SIP/101");
         Extension ext2 = new Extension("LocalSets", "SIP/102", "SIP/102");
         Extension ext3 = new Extension("LocalSets", "SIP/103", "SIP/103");
-        new Client().demo("192.168.1.103", "admin", "amp111", "600",
+        new Client().demo("10.40.61.253", "admin", "amp111", "600",
                 new Extension[]{ ext1, ext2/* ,ext3*/}, null);
 
         //		new Client().demo("192.168.1.104", "admin", "amp111", "600", 

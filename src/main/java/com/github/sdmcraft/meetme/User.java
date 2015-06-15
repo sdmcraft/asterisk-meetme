@@ -67,6 +67,7 @@ public class User extends Observable implements PropertyChangeListener {
         }
         if(transferred) {
             logger.info("Dispatching meetMeUser-transferred");
+            setChanged();
             notifyObservers(new Event(EventType.USER_TRANSFERRED));
         }
     }

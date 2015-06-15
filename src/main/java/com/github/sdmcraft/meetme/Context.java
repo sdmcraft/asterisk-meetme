@@ -16,9 +16,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Observable;
+import java.util.*;
 import java.util.logging.Logger;
 
 // TODO: Auto-generated Javadoc
@@ -158,6 +156,16 @@ public class Context extends Observable {
     public void destroy() {
         liveEventHandler.destroy();
         connection.disconnect();
+    }
+
+    public List<Conference> getChildConferences(String confNumber) {
+        List<Conference> children = new ArrayList<Conference>();
+        for(Conference child : conferences.values()) {
+            if(child.getParentConference() != null && child.getParentConference().getconferenceNumber().equals(confNumber)) {
+                children.add(child);
+            }
+        }
+        return children;
     }
 
     /**
