@@ -167,17 +167,9 @@ public class User extends Observable implements PropertyChangeListener {
      * @return the user id
      */
     public String getUserId() {
-        return generateUserId(this.meetMeUser);
+        return this.getPhoneNumber();
     }
 
-    public static String generateUserId(MeetMeUser meetMeUser) {
-        return generateUserId(meetMeUser, meetMeUser.getRoom().getRoomNumber());
-    }
-
-    public static String generateUserId(MeetMeUser meetMeUser, String conferenceId) {
-        return AsteriskUtils.getUserPhoneNumber(meetMeUser) + "@"
-                + conferenceId;
-    }
 
     /**
      * Checks if is muted.

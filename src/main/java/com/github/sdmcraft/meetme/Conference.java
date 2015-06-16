@@ -181,7 +181,7 @@ public class Conference extends Observable {
         pendingDialOuts.add(extn.getCallerId());
 
         logger.info("Dial out was requested for " + extn.getNumber());
-        return extn.getNumber() + "@" + meetMeRoom.getRoomNumber();
+        return extn.getNumber();
     }
 
     /**
@@ -220,9 +220,8 @@ public class Conference extends Observable {
     public void handleJoinConferenceUser(MeetMeUser meetMeUser) throws Exception {
         logger.info("Handling meetMeUser join event");
         User conferenceUser = null;
-        //TODO:Get rid of this generating userid stupidity. Use the userid provided by Asterisk
-        if(conferenceUserMap.containsKey(User.generateUserId(meetMeUser, conferenceNumber))) {
-            conferenceUser = conferenceUserMap.get(User.generateUserId(meetMeUser, conferenceNumber));
+        if(conferenceUserMap.containsKey(AsteriskUtils.getUserPhoneNumber(meetMeUser))) {
+            conferenceUser = conferenceUserMap.get(AsteriskUtils.getUserPhoneNumber(meetMeUser));
             conferenceUser.addOrReplaceMeetMeUser(meetMeUser);
         } else {
             conferenceUser = new User(meetMeUser);
