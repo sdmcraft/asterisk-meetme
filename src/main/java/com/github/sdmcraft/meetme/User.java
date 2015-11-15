@@ -178,4 +178,8 @@ public class User extends Observable implements PropertyChangeListener {
         return alive;
     }
 
+    public String getConferenceId() {
+        return this.meetMeUser.getRoom().getRoomNumber();
+    }
+
 }

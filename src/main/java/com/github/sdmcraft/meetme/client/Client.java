@@ -21,7 +21,7 @@ import java.util.Observer;
  * The Class Client.
  */
 public class Client implements Observer {
-    Map<String, User> users = new HashMap<String, User>();
+
 
     /*
      * (non-Javadoc)
@@ -37,15 +37,13 @@ public class Client implements Observer {
 
                 User user = (User) event.getData();
                 user.addObserver(this);
-                users.put(user.getPhoneNumber(), user);
                 System.out.println(user.getUserId() +
-                        " joined the audio conference with phone number " +
-                        user.getPhoneNumber());
+                        " joined the audio conference  " +
+                        user.getConferenceId());
 
                 break;
 
             case CONFERENCE_ENDED:
-                users.clear();
                 System.out.println("The audio conference ended");
 
                 break;
@@ -76,9 +74,8 @@ public class Client implements Observer {
 
             case USER_LEFT:
                 user = (User) dispatcher;
-                users.remove(user.getPhoneNumber());
                 System.out.println(user.getPhoneNumber() +
-                        " left the audio conference");
+                        " left the audio conference " + user.getConferenceId());
 
                 break;
         }
