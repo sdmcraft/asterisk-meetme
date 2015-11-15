@@ -99,22 +99,15 @@ public class Context extends Observable {
             this.asteriskPassword = asteriskPassword;
             connection = new Connection(asteriskIp, asteriskAdmin,
                     asteriskPassword);
-            connection.connect();
+
             asteriskServer = new DefaultAsteriskServer(
                     connection.getManagerConnection());
+            liveEventHandler = new LiveEventHandler(this);
+            liveEventHandler.init();
             this.extensionURL = extensionURL;
         } catch (Exception ex) {
             throw new Exception(ex);
         }
-    }
-
-    /**
-     * Initializes the context to start receiving events from the Asterisk
-     * server.
-     */
-    private void init() {
-        liveEventHandler = new LiveEventHandler(this);
-        liveEventHandler.init();
     }
 
     /**
@@ -134,7 +127,6 @@ public class Context extends Observable {
                                       String asteriskPassword, String extensionUrl) throws Exception {
         Context context = new Context(asteriskIp, asteriskAdmin,
                 asteriskPassword, extensionUrl);
-        context.init();
         return context;
     }
 

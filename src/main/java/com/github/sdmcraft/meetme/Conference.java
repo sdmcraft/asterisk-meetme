@@ -169,7 +169,7 @@ public class Conference extends Observable {
         pendingDialOuts.add(extn.getCallerId());
 
         logger.info("Dial out was requested for " + extn.getNumber());
-        return extn.getNumber() + "@" + meetMeRoom.getRoomNumber();
+        return extn.getNumber();
     }
 
     /**
@@ -178,7 +178,7 @@ public class Conference extends Observable {
      * @throws Exception the exception
      */
     public void requestEndConference() throws Exception {
-        logger.info("Request received to end conference. Hanging up all users..");
+        logger.info("Request received to end conference. Hanging up all users.");
 
 		/*
          * Lock conferenceUserMap to avoid user left events modifying it while
@@ -192,11 +192,17 @@ public class Conference extends Observable {
         }
     }
 
+    public void requestMoveConference(User user, String confNumber) {
+        if (!context.getConferences().containsKey(confNumber)) {
+            Conference.getInstance(confNumber, context);
+        }
+        user.requestTransfer(confNumber);
+    }
+
     /**
      * Handle add conference user.
      *
      * @param user        the user
-     * @param phoneNumber the phone number
      * @throws Exception the exception
      */
     public void handleAddConferenceUser(MeetMeUser user) throws Exception {
@@ -241,15 +247,6 @@ public class Conference extends Observable {
      */
     public Map<String, User> getUsers() {
         return conferenceUserMap;
-    }
-
-    /**
-     * Gets the context.
-     *
-     * @return the context
-     */
-    public Context getState() {
-        return context;
     }
 
     /**
