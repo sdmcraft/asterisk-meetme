@@ -109,20 +109,30 @@ public class Client implements Observer {
             Thread.sleep(30000);
         }
 
-        if (conference.getUsers().containsKey("SIP/6000")) {
+        if (conference.getUsers().containsKey(extensions[0].getNumber())) {
 
-            conference.getUsers().get("SIP/6000").requestMuteStateChange();
+            //Mute an extension for 10 seconds
+            conference.getUsers().get(extensions[0].getNumber()).requestMuteStateChange();
             Thread.sleep(10000);
 
-            conference.getUsers().get("SIP/6000").requestMuteStateChange();
-            Thread.sleep(10000);
+            //Unmute the muted extension
+            conference.getUsers().get(extensions[0].getNumber()).requestMuteStateChange();
 
-            //users.get("SIP/6000").requestStopRecording();
+            //Hangup the user after 10 seconds
+            Thread.sleep(10000);
             conference.getUsers().get("SIP/6000").requestHangUp();
-            Thread.sleep(10000);
         }
 
+        //End the conference after 10 seconds. This should hangup all users
+        Thread.sleep(10000);
+        conference.requestEndConference();
+
+        //Destroy the conference after 10 seconds
+        Thread.sleep(10000);
         conference.destroy();
+
+        //Destroy the context after 10 seconds
+        Thread.sleep(10000);
         context.destroy();
     }
 
