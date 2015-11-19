@@ -105,21 +105,20 @@ public class Client implements Observer {
         for (Extension extn : extensions) {
             System.out.println("User Number:" +
                     conference.requestDialOut(extn) + " dialled out");
+            //Wait for dial-out to be answered
             Thread.sleep(30000);
         }
 
-        if (users.containsKey("SIP/6000")) {
-            //users.get("SIP/6000").requestStartRecording();
+        if (conference.getUsers().containsKey("SIP/6000")) {
+
+            conference.getUsers().get("SIP/6000").requestMuteStateChange();
             Thread.sleep(10000);
 
-            users.get("SIP/6000").requestMuteStateChange();
-            Thread.sleep(10000);
-
-            users.get("SIP/6000").requestMuteStateChange();
+            conference.getUsers().get("SIP/6000").requestMuteStateChange();
             Thread.sleep(10000);
 
             //users.get("SIP/6000").requestStopRecording();
-            users.get("SIP/6000").requestHangUp();
+            conference.getUsers().get("SIP/6000").requestHangUp();
             Thread.sleep(10000);
         }
 
