@@ -97,10 +97,10 @@ public class Client implements Observer {
      * @throws TimeoutException              the timeout exception
      * @throws InterruptedException          the interrupted exception
      */
-    public void demo(String ip, String admin, String pwd,
+    public void demo(String ip, int port, String admin, String pwd,
                      String conferenceNumber, Extension[] extensions, String extensionUrl)
             throws Exception {
-        Context context = Context.getInstance(ip, admin, pwd, extensionUrl);
+        Context context = Context.getInstance(ip, port, admin, pwd, extensionUrl);
         Conference conference = Conference.getInstance(conferenceNumber, context);
         conference.addObserver(this);
         Thread.sleep(2 * 1000);
@@ -147,12 +147,13 @@ public class Client implements Observer {
 //                    "SIP/callcentric/011919971647800")
 //            }, null);
         String asteriskIP = "52.77.219.101";
+        int asteriskAMIport = 4502;
         String asteriskAMIuser = "admin";
         String asteriskAMIpwd = "amp111";
         String confNumber = "6000";
         Extension[] extensions = new Extension[]{new Extension("from-callcentric", "SIP/callcentric/17772941415102", "SIP/callcentric/17772941415102")};
 
-        new Client().demo(asteriskIP, asteriskAMIuser, asteriskAMIpwd, confNumber, extensions, null);
+        new Client().demo(asteriskIP, asteriskAMIport, asteriskAMIuser, asteriskAMIpwd, confNumber, extensions, null);
 
         //		new Client().demo("192.168.1.104", "admin", "amp111", "600", 
         //				new Extension[] { new Extension("from-internal", "SIP/callcentric/011919971647800", "SIP/callcentric/011919971647800") },
