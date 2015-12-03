@@ -152,12 +152,12 @@ public class Conference extends Observable {
         logger.info("Requesting dial out for phone: " + extn.getNumber());
         OriginateAction dialoutAction = new OriginateAction();
         dialoutAction.setChannel(extn.getNumber());
-        dialoutAction.setContext(extn.getContext());
-        dialoutAction.setCallerId(extn.getCallerId());
+        //dialoutAction.setContext(extn.getContext());
+        //dialoutAction.setCallerId(extn.getCallerId());
 
 		/* TODO Remove these hardcodings */
-        dialoutAction.setPriority(new Integer(1));
-        dialoutAction.setTimeout(new Long(30000));
+        //dialoutAction.setPriority(new Integer(1));
+        //dialoutAction.setTimeout(new Long(30000));
 
         //dialoutAction.setExten(meetMeRoom.getRoomNumber());
         dialoutAction.setApplication("MeetMe");

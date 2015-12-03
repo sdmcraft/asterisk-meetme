@@ -39,6 +39,24 @@ public class Connection {
     }
 
     /**
+     * Instantiates a new connection.
+     *
+     * @param address the address
+     * @param port the port
+     * @param uname   the uname
+     * @param pwd     the pwd
+     */
+    public Connection(String address, int port, String uname, String pwd) {
+        logger.info("Creating a manager connection for " + address + ","
+                + uname);
+        ManagerConnectionFactory factory = new ManagerConnectionFactory(
+                address, port, uname, pwd);
+
+        this.managerConnection = factory.createManagerConnection();
+
+    }
+
+    /**
      * Connect.
      *
      * @throws IllegalStateException         the illegal state exception

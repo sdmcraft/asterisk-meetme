@@ -89,7 +89,7 @@ public class Context extends Observable {
      * @throws AuthenticationFailedException the authentication failed exception
      * @throws TimeoutException              the timeout exception
      */
-    private Context(String asteriskIp, String asteriskAdmin,
+    private Context(String asteriskIp, int port, String asteriskAdmin,
                     String asteriskPassword, String extensionURL) throws Exception {
         try {
             logger.info("Creating a new context for " + asteriskIp + ","
@@ -97,7 +97,7 @@ public class Context extends Observable {
             this.asteriskIp = asteriskIp;
             this.asteriskAdmin = asteriskAdmin;
             this.asteriskPassword = asteriskPassword;
-            connection = new Connection(asteriskIp, asteriskAdmin,
+            connection = new Connection(asteriskIp, port, asteriskAdmin,
                     asteriskPassword);
 
             asteriskServer = new DefaultAsteriskServer(
@@ -123,9 +123,9 @@ public class Context extends Observable {
      * @throws AuthenticationFailedException the authentication failed exception
      * @throws TimeoutException              the timeout exception
      */
-    public static Context getInstance(String asteriskIp, String asteriskAdmin,
+    public static Context getInstance(String asteriskIp, int port, String asteriskAdmin,
                                       String asteriskPassword, String extensionUrl) throws Exception {
-        Context context = new Context(asteriskIp, asteriskAdmin,
+        Context context = new Context(asteriskIp, port, asteriskAdmin,
                 asteriskPassword, extensionUrl);
         return context;
     }
