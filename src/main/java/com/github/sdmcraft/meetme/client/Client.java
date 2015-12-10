@@ -146,7 +146,8 @@ public class Client implements Observer {
 //                new Extension("LocalSets", "SIP/callcentric/011919971647800",
 //                    "SIP/callcentric/011919971647800")
 //            }, null);
-        String asteriskIP = "52.77.219.101";
+
+        String asteriskIP = "52.77.227.65";
         int asteriskAMIport = 4502;
         String asteriskAMIuser = "admin";
         String asteriskAMIpwd = "amp111";
