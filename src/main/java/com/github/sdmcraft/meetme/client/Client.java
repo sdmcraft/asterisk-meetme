@@ -153,9 +153,15 @@ public class Client implements Observer {
 //                    "SIP/callcentric/011919971647800")
 //            }, null);
 
-        new Client().demo("sdm-vm1.ddns.net", 4502, "admin", "amp111", "6000",
-                new Extension[]{new Extension("from-callcentric", "SIP/callcentric/17772941415102", "SIP/callcentric/17772941415102")},
-                null);
+        String asteriskIP = "52.77.227.65";
+        int asteriskAMIport = 4502;
+        String asteriskAMIuser = "admin";
+        String asteriskAMIpwd = "amp111";
+        String confNumber = "6000";
+        Extension[] extensions = new Extension[]{new Extension("from-callcentric", "SIP/callcentric/17772941415102", "SIP/callcentric/17772941415102")};
+
+        new Client().demo(asteriskIP, asteriskAMIport, asteriskAMIuser, asteriskAMIpwd, confNumber, extensions, null);
+
 
         //		new Client().demo("192.168.1.104", "admin", "amp111", "600", 
         //				new Extension[] { new Extension("from-internal", "SIP/callcentric/011919971647800", "SIP/callcentric/011919971647800") },
