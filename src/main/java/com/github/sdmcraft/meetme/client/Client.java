@@ -146,10 +146,13 @@ public class Client implements Observer {
 //                new Extension("LocalSets", "SIP/callcentric/011919971647800",
 //                    "SIP/callcentric/011919971647800")
 //            }, null);
+        String asteriskIP = "52.77.219.101";
+        String asteriskAMIuser = "admin";
+        String asteriskAMIpwd = "amp111";
+        String confNumber = "6000";
+        Extension[] extensions = new Extension[]{new Extension("from-callcentric", "SIP/callcentric/17772941415102", "SIP/callcentric/17772941415102")};
 
-        new Client().demo("192.168.1.103", "admin", "amp111", "600",
-                new Extension[]{new Extension("LocalSets", "SIP/101", "SIP/101")},
-                null);
+        new Client().demo(asteriskIP, asteriskAMIuser, asteriskAMIpwd, confNumber, extensions, null);
 
         //		new Client().demo("192.168.1.104", "admin", "amp111", "600", 
         //				new Extension[] { new Extension("from-internal", "SIP/callcentric/011919971647800", "SIP/callcentric/011919971647800") },
