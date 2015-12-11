@@ -153,7 +153,7 @@ public class Conference extends Observable {
         OriginateAction dialoutAction = new OriginateAction();
         dialoutAction.setChannel(extn.getNumber());
         //dialoutAction.setContext(extn.getContext());
-        //dialoutAction.setCallerId(extn.getCallerId());
+        dialoutAction.setCallerId(extn.getCallerId());
 
 		/* TODO Remove these hardcodings */
         //dialoutAction.setPriority(new Integer(1));
