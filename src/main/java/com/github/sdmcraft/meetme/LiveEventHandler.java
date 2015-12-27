@@ -163,10 +163,10 @@ public class LiveEventHandler implements AsteriskServerListener,
             Conference conference = context.getConferences()
                     .get(user.getRoom().getRoomNumber());
             if(conference == null) {
-                logger.info("Instantiating conference on user join");
-                conference = Conference.getInstance(user.getRoom().getRoomNumber(), context);
+                logger.warning("User " + user.getUserNumber() + " joined a non-existent conference " + user.getRoom().getRoomNumber());
+            } else {
+                conference.handleAddConferenceUser(user);
             }
-            conference.handleAddConferenceUser(user);
         } catch (Exception ex) {
             logger.log(Level.WARNING, ex.getMessage(), ex);
         }

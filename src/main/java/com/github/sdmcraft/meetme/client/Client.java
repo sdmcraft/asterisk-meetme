@@ -122,9 +122,14 @@ public class Client implements Observer {
             }
 
             if(testTransfer) {
+                String confNumber2 = Integer.toString(Integer.parseInt(conferenceNumber) + 1);
+                Conference conference2 = Conference.getInstance(confNumber2, context);
+                conference2.addObserver(this);
+                Thread.sleep(2 * 1000);
+
                 System.out.printf("Requesting user: %s to be transferred from room %s to %s", extensions[0].getNumber(),
-                        conferenceNumber, Integer.toString(Integer.parseInt(conferenceNumber) + 1));
-                conference.getUsers().get(extensions[0].getNumber()).requestTransfer(Integer.toString(Integer.parseInt(conferenceNumber) + 1));
+                        conferenceNumber, confNumber2);
+                conference.getUsers().get(extensions[0].getNumber()).requestTransfer(confNumber2);
             }
 
             //Hangup the user after 10 seconds
@@ -162,7 +167,7 @@ public class Client implements Observer {
 //                    "SIP/callcentric/011919971647800")
 //            }, null);
 
-        String asteriskIP = "52.77.227.65";
+        String asteriskIP = "sdm-vm1.ddns.net";
         int asteriskAMIport = 4502;
         String asteriskAMIuser = "admin";
         String asteriskAMIpwd = "amp111";
