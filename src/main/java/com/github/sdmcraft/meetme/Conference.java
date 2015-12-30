@@ -225,7 +225,7 @@ public class Conference extends Observable {
         logger.info("Handling conference end event");
         conferenceUserMap.clear();
         setChanged();
-        notifyObservers(new Event(EventType.CONFERENCE_ENDED));
+        notifyObservers(new Event(EventType.CONFERENCE_ENDED, this));
     }
 
     /**
