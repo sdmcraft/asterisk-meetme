@@ -193,12 +193,6 @@ public class Conference extends Observable {
         }
     }
 
-    public void requestMoveConference(User user, String confNumber) {
-        if (!context.getConferences().containsKey(confNumber)) {
-            Conference.getInstance(confNumber, context);
-        }
-        user.requestTransfer(confNumber);
-    }
 
     /**
      * Handle add conference user.

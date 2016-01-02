@@ -78,9 +78,8 @@ public class User extends Observable implements PropertyChangeListener {
         meetMeUser.getChannel().stopMonitoring();
     }
 
-    public void requestTransfer(String roomNumber) {
-        //TODO Remove hardcoding
-        meetMeUser.getChannel().redirect("LocalSets", roomNumber, 1);
+    public void requestTransfer(String roomNumber, String context) {
+        meetMeUser.getChannel().redirect(context, roomNumber, 1);
     }
 
     /*

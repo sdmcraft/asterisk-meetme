@@ -95,7 +95,7 @@ public class Client implements Observer {
      * @throws InterruptedException          the interrupted exception
      */
     public void demo(String ip, int port, String admin, String pwd,
-                     String conferenceNumber, Extension[] extensions, String extensionUrl, boolean testMute, boolean testTransfer)
+                     String conferenceNumber, String confNumberContext, Extension[] extensions, String extensionUrl, boolean testMute, boolean testTransfer)
             throws Exception {
         Context context = Context.getInstance(ip, port, admin, pwd, extensionUrl);
         Conference conference = Conference.getInstance(conferenceNumber, context);
@@ -129,7 +129,7 @@ public class Client implements Observer {
 
                 System.out.printf("Requesting user: %s to be transferred from room %s to %s", extensions[0].getNumber(),
                         conferenceNumber, confNumber2);
-                conference.getUsers().get(extensions[0].getNumber()).requestTransfer(confNumber2);
+                conference.getUsers().get(extensions[0].getNumber()).requestTransfer(confNumber2, confNumberContext);
             }
 
             //Hangup the user after 10 seconds
@@ -172,9 +172,10 @@ public class Client implements Observer {
         String asteriskAMIuser = "admin";
         String asteriskAMIpwd = "amp111";
         String confNumber = "6000";
-        Extension[] extensions = new Extension[]{new Extension("from-callcentric", "SIP/callcentric/17772941415102", "SIP/callcentric/17772941415102")};
+        String confNumberContext = "LocalSets";
+        Extension[] extensions = new Extension[]{new Extension("SIP/callcentric/17772941415102", "SIP/callcentric/17772941415102")};
 
-        new Client().demo(asteriskIP, asteriskAMIport, asteriskAMIuser, asteriskAMIpwd, confNumber, extensions, null, false, true);
+        new Client().demo(asteriskIP, asteriskAMIport, asteriskAMIuser, asteriskAMIpwd, confNumber, confNumberContext, extensions, null, false, true);
 
 
         //		new Client().demo("192.168.1.104", "admin", "amp111", "600", 
