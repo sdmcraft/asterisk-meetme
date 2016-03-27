@@ -24,11 +24,6 @@ public class Conference extends Observable {
     private final MeetMeRoom meetMeRoom;
 
     /**
-     * A map of conference users to their respective meetme userIDs
-     */
-    private final Map<String, User> conferenceUserMap;
-
-    /**
      * The context.
      */
     private final Context context;
@@ -63,8 +58,6 @@ public class Conference extends Observable {
         meetMeRoom = context.getAsteriskServer()
                 .getMeetMeRoom(conferenceNumber);
         this.context = context;
-        this.conferenceUserMap = meetMeUsersToConferenceUserMap(meetMeRoom
-                .getUsers());
         this.conferenceNumber = conferenceNumber;
     }
 
@@ -139,8 +132,8 @@ public class Conference extends Observable {
      * @param phoneNumber the phone number
      * @return the conference user
      */
-    private User getConferenceUser(String phoneNumber) {
-        for (User conferenceUser : this.conferenceUserMap.values()) {
+    public User getConferenceUser(String phoneNumber) {
+        for (User conferenceUser : getUsers()) {
             if (phoneNumber.equals(conferenceUser.getPhoneNumber()))
                 return conferenceUser;
         }
@@ -181,15 +174,8 @@ public class Conference extends Observable {
     public void requestEndConference() throws Exception {
         logger.info("Request received to end conference. Hanging up all users.");
 
-		/*
-         * Lock conferenceUserMap to avoid user left events modifying it while
-		 * we place hangup requests for all users
-		 */
-        synchronized (conferenceUserMap) {
-            for (String userId : conferenceUserMap.keySet()) {
-                conferenceUserMap.get(userId).requestHangUp();
-            }
-
+        for (User user : getUsers()) {
+            user.requestHangUp();
         }
     }
 
@@ -203,7 +189,6 @@ public class Conference extends Observable {
     public void handleAddConferenceUser(MeetMeUser user) throws Exception {
         logger.info("Handling user join event");
         User conferenceUser = new User(user);
-        conferenceUserMap.put(conferenceUser.getUserId(), conferenceUser);
 
         setChanged();
 
@@ -217,7 +202,6 @@ public class Conference extends Observable {
      */
     public void handleEndConference() {
         logger.info("Handling conference end event");
-        conferenceUserMap.clear();
         setChanged();
         notifyObservers(new Event(EventType.CONFERENCE_ENDED, this));
     }
@@ -227,11 +211,10 @@ public class Conference extends Observable {
      */
     public void destroy() {
         logger.info("Destroying the conference " + conferenceNumber);
-        for (User user : conferenceUserMap.values()) {
+        for (User user : getUsers()) {
             if (user.isAlive())
                 user.requestHangUp();
         }
-        conferenceUserMap.clear();
         context.getConferences().remove(conferenceNumber);
     }
 
@@ -240,8 +223,13 @@ public class Conference extends Observable {
      *
      * @return the users
      */
-    public Map<String, User> getUsers() {
-        return conferenceUserMap;
+    public Collection<User> getUsers() {
+        Collection<MeetMeUser> meetMeUsers = this.meetMeRoom.getUsers();
+        Collection<User> users = new ArrayList<>();
+        for(MeetMeUser meetMeUser : meetMeUsers) {
+            users.add(meetMeUserToConferenceUser(meetMeUser));
+        }
+        return users;
     }
 
     /**

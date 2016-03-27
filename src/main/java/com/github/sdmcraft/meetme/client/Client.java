@@ -109,15 +109,16 @@ public class Client implements Observer {
             Thread.sleep(10000);
         }
 
-        if (conference.getUsers().containsKey(extensions[0].getNumber())) {
+        if (conference.getConferenceUser(extensions[0].getNumber()) != null) {
 
+            User user = conference.getConferenceUser(extensions[0].getNumber());
             if(testMute) {
                 //Mute an extension for 10 seconds
-                conference.getUsers().get(extensions[0].getNumber()).requestMuteStateChange();
+                user.requestMuteStateChange();
                 Thread.sleep(10000);
 
                 //Unmute the muted extension
-                conference.getUsers().get(extensions[0].getNumber()).requestMuteStateChange();
+                user.requestMuteStateChange();
 
             }
 
@@ -129,12 +130,15 @@ public class Client implements Observer {
 
                 System.out.printf("Requesting user: %s to be transferred from room %s to %s", extensions[0].getNumber(),
                         conferenceNumber, confNumber2);
-                conference.getUsers().get(extensions[0].getNumber()).requestTransfer(confNumber2, confNumberContext);
+                user.requestTransfer(confNumber2, confNumberContext);
+
+                Thread.sleep(5000);
+                user = conference2.getConferenceUser(extensions[0].getNumber());
             }
 
             //Hangup the user after 10 seconds
             Thread.sleep(10000);
-            conference.getUsers().get(conference.getUsers().get(extensions[0].getNumber())).requestHangUp();
+            user.requestHangUp();
         }
 
         //End the conference after 10 seconds. This should hangup all users
@@ -167,7 +171,7 @@ public class Client implements Observer {
 //                    "SIP/callcentric/011919971647800")
 //            }, null);
 
-        String asteriskIP = "sdm-vm1.ddns.net";
+        String asteriskIP = "54.169.204.99";
         int asteriskAMIport = 4502;
         String asteriskAMIuser = "admin";
         String asteriskAMIpwd = "amp111";
